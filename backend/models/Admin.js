@@ -7,8 +7,18 @@ const adminSchema=new Schema({
         required:true,
     },
     location:{
-        type:String,
-        required:true
+        street_no:{
+            type:Number,
+            required:true
+        },
+        city:{
+            type:String,
+            required:true
+        },
+        state:{
+            type:String,
+            required:true,
+        }
     },
     email:{
         type:String,

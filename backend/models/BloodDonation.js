@@ -27,5 +27,5 @@ const bloodDonationSchema=new Schema({
         default:Date.now,
     }
 });
-const BloodDonation=mongoose.Model("BloodDonation",bloodDonationSchema);
+const BloodDonation=mongoose.model("BloodDonation",bloodDonationSchema);
 module.exports=BloodDonation;
