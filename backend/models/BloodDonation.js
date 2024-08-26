@@ -16,7 +16,11 @@ const bloodDonationSchema=new Schema({
     },
     quantity:{
         type:Number,
-        required:true,
+    },
+    status:{
+        type:String,
+        enum:['Pending','fulfilled','rejected'],
+        default:'Pending'
     },
     created_at:{
         type:Date,

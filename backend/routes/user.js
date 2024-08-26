@@ -1,21 +1,51 @@
 const express=require('express');
 const router=express.Router();
 const User=require('../models/User');
+const bcrypt=require('bcrypt');
+const jwt=require('jsonwebtoken');
+
+const JWT_SECRET=process.env.JWT_SECRET;
 
 router.get('/',async(req,res)=>{
     let data=await User.find();
     res.status(200).json(data);
 });
 
-router.post('/',async(req,res)=>{
-    try{
-        let data=req.body;
-        let user=new User(data);
+router.post('/register', async (req, res) => {
+    try {
+        const { name, email, password, blood_type, contact_number, address } = req.body;
+        let user = await User.findOne({ email });
+        if (user) {
+            return res.status(400).json({ message: "User already exists" });
+        }
+        user = new User({ name, email, password, blood_type, contact_number, address });
         await user.save();
         res.status(201).json(user);
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: "Server error" });
+    }
+});
+
+router.post('/login',async(req,res)=>{
+    try{
+        const {email,password}=req.body;
+        let user=await User.findOne({email:email});
+        if(!user){
+            res.status(400).json({message:"User doesn't exist"});
+        }
+        const match=await bcrypt.compare(password,user.password);
+        if(!match){
+            res.status(400).json({message:"Invalid Credentials"});
+        }
+        const token=jwt.sign({id:user._id},JWT_SECRET,{
+            expiresIn:'5h',
+        })
+        res.json(token);
     }
     catch(error){
-        console.log("Hello");
+        console.log(error);
+        res.status(500).json("Server Error");
     }
 });
 

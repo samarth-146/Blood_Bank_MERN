@@ -30,7 +30,7 @@ app.use('/blood_donation',blood_donation);
 app.use('/blood_inventory',blood_inventory);
 app.use('/admin',admin);
 app.use('/bloodcamp',blood_camp);
-app.use('/bloodrequest',blood_request)
+app.use('/bloodrequest',blood_request);
 
 app.get('/',async(req,res)=>{
     res.send("Data Sent");

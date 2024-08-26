@@ -1,6 +1,7 @@
 const express=require('express');
 const router=express.Router();
 const BloodInventory=require('../models/BloodInventory');
+const authMiddleware=require('../middlewares');
 
 router.get('/',async(req,res)=>{
     const data=await BloodInventory.find();
@@ -13,10 +14,18 @@ router.get('/admin/:admin_id',async(req,res)=>{
     res.status(200).json(data); 
 });
 
-router.post('/',async(req,res)=>{
-    const blood_inventory=new BloodInventory(req.body);
-    await blood_inventory.save();
-    res.status(201).json(blood_inventory);
+router.post('/',authMiddleware,async(req,res)=>{
+    try{
+        const blood_inventory=new BloodInventory(req.body);
+        blood_inventory.admin_id=req.user;
+        await blood_inventory.save();
+        res.status(201).json(blood_inventory);
+    }
+    catch(error)
+    {
+        console.log(error);
+        res.status(500).message({message:error.message});
+    }
 });
 
 router.patch('/:id',async(req,res)=>{

@@ -1,6 +1,7 @@
 const express=require('express');
 const router=express.Router();
 const BloodDonation=require('../models/BloodDonation');
+const authMiddleware=require('../middlewares');
 
 router.get('/',async(req,res)=>{
     try{
@@ -12,15 +13,17 @@ router.get('/',async(req,res)=>{
     }
 });
 
-router.post('/',async(req,res)=>{
+router.post('/',authMiddleware,async(req,res)=>{
     try{
         let data=req.body;
+        data.user_id=req.user;
         const blooddonation=new BloodDonation(data);
         await blooddonation.save();
         res.status(201).json(blooddonation);
     }
     catch(error){
-        res.status(400).message({error:error.message});
+        console.log(error);
+        res.status(500).message({error:error.message});
     }
 
 });

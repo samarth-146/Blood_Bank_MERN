@@ -6,14 +6,17 @@ const bloodInventorySchema=Schema({
         type: mongoose.Schema.Types.ObjectId, ref: 'Admin', 
         required: true 
     },
-    blood_type:{
-        type:String,
-        required:true
-    },
-    quantity:{
-        type:Number,
-        required:true
-    },
+    blood_inventory:[{
+        blood_type:{
+            type:String,
+            eunm:['A+','B+','A-','B+','O+','O-','AB+','AB-'],
+            required:true
+        },
+        quantity:{
+            type:Number,
+            required:true
+        }
+    }],
     last_updated:{
         type:Date,
         default:Date.now,

@@ -1,5 +1,6 @@
 const mongoose=require('mongoose');
 const {Schema}=mongoose;
+const bcrypt=require('bcrypt');
 
 const adminSchema=new Schema({
     institution_name:{
@@ -32,6 +33,12 @@ const adminSchema=new Schema({
         type:String,
         required:true,
     },
+    blood_inventory:[
+        {
+            type:Schema.Types.ObjectId,
+            ref:"Admin"
+        }
+    ],
     created_at:{
         type:Date,
         default:Date.now
@@ -40,6 +47,13 @@ const adminSchema=new Schema({
         type:Date,
         default:Date.now,
     },
+});
+
+adminSchema.pre('save',async function(next){
+    if(this.isModified('password')){
+        const salt=await bcrypt.genSalt(10);
+        this.password=await bcrypt.hash(this.password,salt);
+    }
 });
 
 const Admin=mongoose.model("Admin",adminSchema);
