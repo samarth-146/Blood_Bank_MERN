@@ -2,6 +2,7 @@ const express=require('express');
 const app=express();
 const mongoose=require('mongoose');
 require('dotenv').config();
+const cors=require('cors');
 
 const blood_donation=require('./routes/blood_donation');
 const admin=require('./routes/admin');
@@ -24,6 +25,7 @@ main().catch(err => console.log(err));
 
 app.use(express.json());
 app.use(express.urlencoded({extended:true}));
+app.use(cors());
 
 app.use('/user',user);
 app.use('/blood_donation',blood_donation);

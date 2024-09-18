@@ -1,7 +1,7 @@
 const express=require('express');
 const router=express.Router();
 const BloodInventory=require('../models/BloodInventory');
-const authMiddleware=require('../middlewares');
+const {authMiddleware}=require('../middlewares');
 
 router.get('/',async(req,res)=>{
     const data=await BloodInventory.find();
