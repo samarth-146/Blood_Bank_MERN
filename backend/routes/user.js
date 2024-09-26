@@ -13,41 +13,66 @@ router.get('/',async(req,res)=>{
 
 router.post('/register', async (req, res) => {
     try {
-        const { name, email, password, blood_type, contact_number, address } = req.body;
-        let user = await User.findOne({ email });
-        if (user) {
-            return res.status(400).json({ message: "User already exists" });
-        }
-        user = new User({ name, email, password, blood_type, contact_number, address });
-        await user.save();
-        res.status(201).json(user);
+        // 1. Create the user
+        const newUser = new User({
+            name: req.body.name,
+            email: req.body.email,
+            password: req.body.password,
+            contact_number: req.body.contact_number,
+            address: req.body.address,
+            blood_type: req.body.blood_type,
+        });
+        await newUser.save();
+
+        // 2. Generate a JWT token after successful registration
+        const token = jwt.sign(
+            { userId: newUser._id }, // Payload
+            process.env.JWT_SECRET, // Secret key from your env file
+            { expiresIn: '5h' } // Token expiration
+        );
+
+        // 3. Send token and user info in the response
+        res.status(201).json({
+            message: 'User registered successfully!',
+            token,
+            user: {
+                id: newUser._id,
+                name: newUser.name,
+                email: newUser.email,
+            }
+        });
+
     } catch (error) {
-        console.log(error);
-        res.status(500).json({ message: "Server error" });
+        res.status(400).json({
+            message: 'User registration failed.',
+            error: error.message
+        });
     }
 });
 
-router.post('/login',async(req,res)=>{
-    try{
-        const {email,password}=req.body;
-        let user=await User.findOne({email:email});
-        if(!user){
-            res.status(400).json({message:"User doesn't exist"});
+router.post('/login', async (req, res) => {
+    try {
+        const { email, password } = req.body;
+        let user = await User.findOne({ email });
+        if (!user) {
+            return res.status(400).json({ message: "User doesn't exist" });
         }
-        const match=await bcrypt.compare(password,user.password);
-        if(!match){
-            res.status(400).json({message:"Invalid Credentials"});
+        const match = await bcrypt.compare(password, user.password);
+        if (!match) {
+            return res.status(400).json({ message: "Invalid Credentials" });
         }
-        const token=jwt.sign({id:user._id},JWT_SECRET,{
-            expiresIn:'5h',
-        })
-        res.json(token);
-    }
-    catch(error){
+        
+        const token = jwt.sign({ id: user._id}, JWT_SECRET, {
+            expiresIn: '5h',
+        });
+
+        res.json({ token}); 
+    } catch (error) {
         console.log(error);
-        res.status(500).json("Server Error");
+        res.status(500).json({ message: "Server Error" });
     }
 });
+
 
 router.get('/:user_id',async(req,res)=>{
     let user_id=req.params.user_id;

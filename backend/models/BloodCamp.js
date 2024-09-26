@@ -14,9 +14,9 @@ const bloodCampSchema = Schema({
         type: Date, 
         required: true 
     },
-    contact_number: { 
-        type: String, 
-        required: true 
+    description:{
+        type:String,
+        required:true
     },
     admin_id: { 
         type: mongoose.Schema.Types.ObjectId, ref: 'Admin', 

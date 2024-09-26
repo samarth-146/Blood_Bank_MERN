@@ -1,61 +1,61 @@
-const mongoose=require('mongoose');
-const {Schema}=mongoose;
-const bcrypt=require('bcrypt');
+const mongoose = require('mongoose');
+const { Schema } = mongoose;
+const bcrypt = require('bcrypt');
 
-const userSchema=new Schema({
-    name:{
-        type:String,
-        required:true
+const userSchema = new Schema({
+    name: {
+        type: String,
+        required: true
     },
-    email:{
-        type: String, 
-        unique: true, 
+    email: {
+        type: String,
+        unique: true,
         required: true,
     },
-    password: { 
-        type: String, 
-        required: true 
-    },
-    blood_type: { 
+    password: {
         type: String,
-        eunm:['A+','B+','A-','B+','O+','O-','AB+','AB-'], 
-        required: true 
+        required: true
     },
-    contact_number: { 
-        type: String, 
-        required: true 
+    blood_type: {
+        type: String,
+        eunm: ['A+', 'B+', 'A-', 'B+', 'O+', 'O-', 'AB+', 'AB-'],
+        required: true
     },
-    address:{
-        street_no:{
-            type:Number,
-            required:true,
+    contact_number: {
+        type: String,
+        required: true
+    },
+    address: {
+        street_no: {
+            type: Number,
+            required: true,
         },
-        apartment_name:{
-            type:String,
-            required:true
+        apartment_name: {
+            type: String,
+            required: true
         },
-        city:{
-            type:String,
-            required:true,
+        city: {
+            type: String,
+            required: true,
         },
-        state:{
-            type:String,
-            required:true,
+        state: {
+            type: String,
+            required: true,
         }
     },
-    blood_donation:[
+    blood_donation: [
         {
-            type:Schema.Types.ObjectId,
-            ref:"BloodDonation"
+            type: Schema.Types.ObjectId,
+            ref: "BloodDonation"
         }
     ],
-    created_at:{
-        type:Date,
-        default:Date.now,
+    created_at: {
+        type: Date,
+        default: Date.now,
     },
-    updated_at:{
-        type:Date,
-        default:Date.now,
+    updated_at: {
+        type: Date,
+        default: Date.now,
     }
 });
 
@@ -66,5 +66,5 @@ userSchema.pre('save', async function (next) {
     }
     next();
 });
-const User=mongoose.model("User",userSchema);
-module.exports=User;
+const User = mongoose.model("User", userSchema);
+module.exports = User;
