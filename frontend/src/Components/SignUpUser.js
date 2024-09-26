@@ -1,4 +1,10 @@
 import React, { useState } from 'react';
+import axios from 'axios';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { useNavigate } from 'react-router-dom';
+
+
 
 const InputField = ({ label, type, id, value, onChange, required }) => (
     <div>
@@ -12,7 +18,7 @@ const InputField = ({ label, type, id, value, onChange, required }) => (
         value={value}
         onChange={onChange}
         required={required}
-        className="mt-2 h-6 block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 sm:text-sm" // Changed mt-1 to mt-2
+        className="mt-2 h-6 block w-full rounded-sm border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 sm:text-sm" // Changed mt-1 to mt-2
       />
     </div>
   );
@@ -51,6 +57,9 @@ const Button = ({ children, type = 'button', className }) => (
 );
 
 export default function UserSignUpPage() {
+    const navigate=useNavigate();
+    const [success, setSuccess] = useState('');
+  const [error, setError] = useState('');
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -71,10 +80,49 @@ export default function UserSignUpPage() {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async(e) => {
     e.preventDefault();
-    console.log('Form submitted:', formData);
-    // Add your form submission logic here
+    const userData={
+        name:formData.name,
+        email:formData.email,
+        password:formData.password,
+        blood_type:formData.bloodType,
+        contact_number:formData.contactNumber,
+        address:{
+            street_no:formData.streetNo,
+            apartment_name:formData.apartmentName,
+            city:formData.city,
+            state:formData.state
+        },
+    };
+    try{
+        const res=await axios.post('http://localhost:8080/user/register', userData);
+        if(res.status===201)
+        {
+            setSuccess("User Registered Successfully");
+            setError('');
+            localStorage.setItem('token', res.data.token);
+            setFormData({
+                name: '',
+                email: '',
+                password: '',
+                bloodType: '',
+                contactNumber: '',
+                streetNo: '',
+                apartmentName: '',
+                city: '',
+                state: ''
+              });
+              toast.success("User Registered Successfully");
+              navigate('/user/home');
+        }
+    }
+    catch(e)
+    {
+        setError("User Registration Failed");
+        setSuccess('');
+
+    }
   };
 
   const bloodTypes = ['A+', 'A-', 'B+', 'B-', 'O+', 'O-', 'AB+', 'AB-'];
@@ -139,7 +187,7 @@ export default function UserSignUpPage() {
             </div>
             <InputField
               label="Street No"
-              type="text"
+              type="number"
               id="streetNo"
               value={formData.streetNo}
               onChange={handleChange}
@@ -197,6 +245,8 @@ export default function UserSignUpPage() {
               </a>
             </div>
           </div>
+          {error && <p className="mt-4 text-red-600">{error}</p>}
+          {success && <p className="mt-4 text-green-600">{success}</p>}
         </div>
       </div>
     </div>

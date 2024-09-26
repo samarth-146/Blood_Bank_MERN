@@ -1,6 +1,28 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import { jwtDecode } from 'jwt-decode';
 
-const Navbar = ({ onSearch }) => (
+
+const Button = ({ children, className, variant = 'primary', onClick }) => {
+  const baseStyle = "px-6 py-2 rounded-md font-semibold text-sm transition-colors duration-200";
+  const variants = {
+    primary: "bg-red-600 text-white hover:bg-red-700",
+    outline: "bg-white text-red-600 border border-red-600 hover:bg-red-50",
+    plain: "bg-white text-black"
+  };
+
+  const buttonClass = `${baseStyle} ${variants[variant]} ${className || ''}`;
+
+  return (
+    <button onClick={onClick} className={buttonClass}>
+      {children}
+    </button>
+  );
+};
+
+const Navbar = ({ onSearch, onLogout }) => (
   <nav className="bg-red-600 shadow-lg">
     <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
       <div className="relative flex items-center justify-between h-16">
@@ -19,6 +41,8 @@ const Navbar = ({ onSearch }) => (
             />
           </div>
         </div>
+        {/* Add the logout button */}
+        <Button onClick={onLogout} className="w-full sm:w-auto">Logout</Button>
       </div>
     </div>
   </nav>
@@ -42,8 +66,43 @@ const BloodBankCard = ({ name, address, contactNumber, availableBloodTypes }) =>
   </div>
 );
 
-export default function BloodBankListPage() {
+const BloodBankListPage=()=> {
   const [searchTerm, setSearchTerm] = useState('');
+  const [user, setUser] = useState({ name: '', email: '', blood_type: '' });
+  const navigate = useNavigate(); // useNavigate must be inside the functional component
+  useEffect(()=>{
+    const fetchData=async()=>{
+      const token=localStorage.getItem('token');
+      if(token)
+      {
+        try{
+          const decodedToken=jwtDecode(token);
+          const userId=decodedToken.userId;
+          const res=await axios.get(`http://localhost:8080/user/${userId}`);
+          setUser({
+            name:res.data.name,
+            email:res.data.email
+          })
+        }
+        catch(error)
+        {
+          console.log(error);
+        }
+      }
+    }
+    fetchData();
+  },[]);
+  // Handle the logout click
+  const handleLogout = async () => {
+    try {
+      await axios.post('http://localhost:8080/user/logout');
+      localStorage.removeItem('token');
+      toast.success("Logged Out Successfully");
+      navigate('/user/signin'); 
+    } catch (error) {
+      console.error("Logout error", error);
+    }
+  };
 
   // Sample data for blood banks
   const bloodBanks = [
@@ -91,10 +150,11 @@ export default function BloodBankListPage() {
 
   return (
     <div className="min-h-screen bg-gray-100">
-      <Navbar onSearch={setSearchTerm} />
+      <Navbar onSearch={setSearchTerm} onLogout={handleLogout} />
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         <div className="px-4 py-6 sm:px-0">
           <h1 className="text-3xl font-bold text-gray-900 mb-6">Blood Banks in the City</h1>
+          <p><strong>Name:</strong> {user.name}</p>
           {filteredBloodBanks && filteredBloodBanks.length > 0 ? (
             filteredBloodBanks.map(bank => (
               <BloodBankCard key={bank.id} {...bank} />
@@ -103,7 +163,10 @@ export default function BloodBankListPage() {
             <p className="text-gray-600 text-center">No blood banks found matching your search.</p>
           )}
         </div>
+        
       </main>
     </div>
   );
 }
+
+export default BloodBankListPage;

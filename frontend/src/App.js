@@ -102,10 +102,15 @@ import SignInUser from './Components/SignInUser';
 import BloodBankListPage from './Components/UserHomePage';
 import BloodBankHomePage from './Components/BloodBankHome';
 import BloodCampForm from './Components/BloodCampForm';
+import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer } from 'react-toastify';
+
 // import SomeOtherPage from './SomeOtherPage';
 
 function App() {
   return (
+    <div>
+      <ToastContainer/>
     <Router>
       <Routes>
         <Route exact path="/" element={<HomePage />} />
@@ -116,6 +121,7 @@ function App() {
         <Route exact path='/admin/camp_form' element={<BloodCampForm/>}/>
       </Routes>
     </Router>
+    </div>
   );
 }
 

@@ -1,4 +1,9 @@
 import React, { useState } from 'react';
+import axios from 'axios';
+import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
+
+
 
 const InputField = ({ label, type, id, value, onChange, required }) => (
   <div>
@@ -12,7 +17,7 @@ const InputField = ({ label, type, id, value, onChange, required }) => (
       value={value}
       onChange={onChange}
       required={required}
-      className="mt-2 h-8 block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 sm:text-sm" // Changed mt-1 to mt-2
+      className="mt-2 h-8 block w-full rounded-sm border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 sm:text-sm" // Changed mt-1 to mt-2
       />
   </div>
 );
@@ -27,6 +32,7 @@ const Button = ({ children, type = 'button', className }) => (
 );
 
 export default function UserSignInPage() {
+    const navigate=useNavigate();
   const [formData, setFormData] = useState({
     email: '',
     password: ''
@@ -40,11 +46,29 @@ export default function UserSignInPage() {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async(e) => {
     e.preventDefault();
-    console.log('Sign In form submitted:', formData);
-    // Add your sign-in logic here
-  };
+    const userData = {
+        email: formData.email,
+        password: formData.password
+    };
+
+    try {
+        const res = await axios.post('http://localhost:8080/user/login', userData);
+        localStorage.setItem('token', res.data.token);
+        navigate('/user/home');
+    } catch (error) {
+        if (error.response && error.response.status === 400) {
+            toast.error("User Doesn't Exist");
+        } else if (error.response && error.response.status === 401) {
+            toast.error("Invalid Credentials");
+        } else {
+            toast.error("An unexpected error occurred");
+        }
+        setFormData({ email: '', password: '' });
+    }
+};
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-red-50 to-gray-100 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
@@ -96,7 +120,7 @@ export default function UserSignInPage() {
 
             <div className="mt-6">
               <a
-                href="/signup/user"
+                href="/user/signup"
                 className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-red-600 bg-white hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
               >
                 Sign up

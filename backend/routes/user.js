@@ -13,7 +13,6 @@ router.get('/',async(req,res)=>{
 
 router.post('/register', async (req, res) => {
     try {
-        // 1. Create the user
         const newUser = new User({
             name: req.body.name,
             email: req.body.email,
@@ -24,14 +23,12 @@ router.post('/register', async (req, res) => {
         });
         await newUser.save();
 
-        // 2. Generate a JWT token after successful registration
         const token = jwt.sign(
-            { userId: newUser._id }, // Payload
-            process.env.JWT_SECRET, // Secret key from your env file
-            { expiresIn: '5h' } // Token expiration
+            { userId: newUser._id }, 
+            process.env.JWT_SECRET, 
+            { expiresIn: '5h' } 
         );
 
-        // 3. Send token and user info in the response
         res.status(201).json({
             message: 'User registered successfully!',
             token,
@@ -53,25 +50,32 @@ router.post('/register', async (req, res) => {
 router.post('/login', async (req, res) => {
     try {
         const { email, password } = req.body;
+        
         let user = await User.findOne({ email });
         if (!user) {
             return res.status(400).json({ message: "User doesn't exist" });
         }
+
         const match = await bcrypt.compare(password, user.password);
         if (!match) {
-            return res.status(400).json({ message: "Invalid Credentials" });
+            return res.status(401).json({ message: "Invalid Credentials" });
         }
         
-        const token = jwt.sign({ id: user._id}, JWT_SECRET, {
+        const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
             expiresIn: '5h',
         });
 
-        res.json({ token}); 
+        res.json({ token, user: { id: user._id, email: user.email } }); 
     } catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({ message: "Server Error" });
     }
 });
+
+
+router.post('/logout',(req,res)=>{
+    res.status(200).json({message:"Logged Out Successfully"});    
+})
 
 
 router.get('/:user_id',async(req,res)=>{
