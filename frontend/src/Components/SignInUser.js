@@ -56,6 +56,7 @@ export default function UserSignInPage() {
     try {
         const res = await axios.post('http://localhost:8080/user/login', userData);
         localStorage.setItem('token', res.data.token);
+        toast.success("Logged in successfully");
         navigate('/user/home');
     } catch (error) {
         if (error.response && error.response.status === 400) {

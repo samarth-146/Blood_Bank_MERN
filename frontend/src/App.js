@@ -104,6 +104,9 @@ import BloodBankHomePage from './Components/BloodBankHome';
 import BloodCampForm from './Components/BloodCampForm';
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from 'react-toastify';
+import PrivateRoute from './PrivateRoute';
+import UserProfile from './Components/UserProfile';
+import AboutPage from './Components/About';
 
 // import SomeOtherPage from './SomeOtherPage';
 
@@ -116,9 +119,11 @@ function App() {
         <Route exact path="/" element={<HomePage />} />
         <Route exact path='/user/signup' element={<UserSignUp/>}/>
         <Route exact path='/user/signin' element={<SignInUser/>}/>
-        <Route exact path='/user/home' element={<BloodBankListPage/>}/>
+        <Route exact path='/user/home' element={<PrivateRoute><BloodBankListPage/></PrivateRoute>} />
         <Route exact path='/admin/home' element={<BloodBankHomePage/>}/>
         <Route exact path='/admin/camp_form' element={<BloodCampForm/>}/>
+        <Route exact path='/user/profile' element={<PrivateRoute><UserProfile/></PrivateRoute>}/>
+        <Route exact path='/about' element={<AboutPage/>} />
       </Routes>
     </Router>
     </div>
