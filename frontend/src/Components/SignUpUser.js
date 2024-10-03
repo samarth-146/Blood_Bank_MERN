@@ -101,7 +101,9 @@ export default function UserSignUpPage() {
         {
             setSuccess("User Registered Successfully");
             setError('');
+            const role="user";
             localStorage.setItem('token', res.data.token);
+            localStorage.setItem('role',role);
             setFormData({
                 name: '',
                 email: '',

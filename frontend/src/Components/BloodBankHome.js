@@ -1,4 +1,34 @@
 import React, { useState } from 'react';
+import axios from 'axios';
+import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
+const Navbar = ({ onLogout,OnProfileClick }) => (
+  <nav className="bg-red-600 shadow-lg mb-8">
+    <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
+      <div className="relative flex items-center justify-between h-16">
+        <div className="flex-1 flex items-center justify-center sm:items-stretch sm:justify-start">
+          <div className="flex-shrink-0 flex items-center">
+            <a href='/admin/home' className="text-white text-lg font-bold">BloodBridge</a>
+          </div>
+        </div>
+        <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
+          <button onClick={OnProfileClick} className="bg-red-700 p-1 rounded-full text-white hover:bg-red-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-red-800 focus:ring-white">
+            <span className="sr-only">View profile</span>
+            <svg className="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            </svg>
+          </button>
+          <button
+            className="ml-4 bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded"
+            onClick={onLogout}
+          >
+            Logout
+          </button>
+        </div>
+      </div>
+    </div>
+  </nav>
+);
 
 const SearchBar = ({ onSearch }) => (
   <div className="mb-6">
@@ -68,8 +98,23 @@ const OrganizeBloodCampButton = () => (
 );
 
 export default function BloodBankHomePage() {
+  const navigate=useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
 
+  const handleLogout = async () => {
+    try {
+      await axios.post('http://localhost:8080/admin/logout');
+      localStorage.removeItem('token');
+      toast.success("Logged Out Successfully");
+      navigate('/admin/signin');
+    } catch (error) {
+      console.error("Logout error", error);
+    }
+  };
+
+  const handleAdminProfile=()=>{
+    navigate('/admin/profile');
+  }
   // Sample data for donors
   const allDonors = [
     { name: "John Doe", contactNumber: "123-456-7890", bloodType: "A+" },
@@ -95,17 +140,20 @@ export default function BloodBankHomePage() {
   );
 
   return (
-    <div className="min-h-screen bg-gray-100 p-8">
-      <h1 className="text-3xl font-bold text-red-600 mb-8">Blood Bank Management System</h1>
-      
-      <SearchBar onSearch={setSearchTerm} />
-      
-      <h2 className="text-2xl font-bold mb-4">Donor List</h2>
-      <DonorTable donors={filteredDonors} />
-      
-      <InventoryTable inventory={inventoryData} />
-      
-      <OrganizeBloodCampButton />
+    <div className="min-h-screen bg-gray-100">
+      <Navbar onLogout={handleLogout} OnProfileClick={handleAdminProfile} />
+      <div className="p-8">
+        <h1 className="text-3xl font-bold text-red-600 mb-8">Blood Bank Management System</h1>
+        
+        <SearchBar onSearch={setSearchTerm} />
+        
+        <h2 className="text-2xl font-bold mb-4">Donor List</h2>
+        <DonorTable donors={filteredDonors} />
+        
+        <InventoryTable inventory={inventoryData} />
+        
+        <OrganizeBloodCampButton />
+      </div>
     </div>
   );
 }

@@ -31,7 +31,7 @@ const Button = ({ children, type = 'button', className }) => (
   </button>
 );
 
-export default function UserSignInPage() {
+export default function AdminSignIn() {
     const navigate=useNavigate();
   const [formData, setFormData] = useState({
     email: '',
@@ -54,12 +54,13 @@ export default function UserSignInPage() {
     };
 
     try {
-        const res = await axios.post('http://localhost:8080/user/login', userData);
-        const role="user";
-        localStorage.setItem('token', res.data.token);
+        const res = await axios.post('http://localhost:8080/admin/login', userData);
+        const role="admin";
+        localStorage.setItem('token', res.data);
         localStorage.setItem('role',role);
+        // console.log(res.data);
         toast.success("Logged in successfully");
-        navigate('/user/home');
+        navigate('/admin/home');
     } catch (error) {
         if (error.response && error.response.status === 400) {
             toast.error("User Doesn't Exist");
@@ -123,7 +124,7 @@ export default function UserSignInPage() {
 
             <div className="mt-6">
               <a
-                href="/user/signup"
+                href="/admin/signup"
                 className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-red-600 bg-white hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
               >
                 Sign up

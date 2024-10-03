@@ -1,32 +1,8 @@
-import React, {useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-// import { jwtDecode } from 'jwt-decode';
-  // const [user, setUser] = useState({ name: '', email: '', blood_type: '' });
 
-  // useEffect(()=>{
-  //   const fetchData=async()=>{
-  //     const token=localStorage.getItem('token');
-  //     if(token)
-  //     {
-  //       try{
-  //         const decodedToken=jwtDecode(token);
-  //         const userId=decodedToken.userId;
-  //         const res=await axios.get(`http://localhost:8080/user/${userId}`);
-  //         setUser({
-  //           name:res.data.name,
-  //           email:res.data.email
-  //         })
-  //       }
-  //       catch(error)
-  //       {
-  //         console.log(error);
-  //       }
-  //     }
-  //   }
-  //   fetchData();
-  // },[]);
 
 const Button = ({ children, className, variant = 'primary', onClick }) => {
   const baseStyle = "px-6 py-2 rounded-md font-semibold text-sm transition-colors duration-200";
@@ -79,19 +55,28 @@ const Navbar = ({ onSearch, onLogout, onProfileClick }) => (
   </nav>
 );
 
-const BloodBankCard = ({ name, address, contactNumber, availableBloodTypes }) => (
-  <div className="bg-white shadow-md rounded-lg p-6 mb-4 hover:shadow-lg transition-shadow duration-300">
-    <h2 className="text-xl font-semibold text-gray-800 mb-2">{name}</h2>
-    <p className="text-gray-600 mb-2">{address}</p>
-    <p className="text-gray-600 mb-2">Contact: {contactNumber}</p>
+const BloodBankCard = ({ id, institution_name, location, contact_number, availableBloodTypes, onClick }) => (
+  <div
+    className="bg-white shadow-md rounded-lg p-6 mb-4 hover:shadow-lg transition-shadow duration-300 cursor-pointer"
+    onClick={() => onClick(id)}
+  >
+    <h2 className="text-xl font-semibold text-gray-800 mb-2">{institution_name}</h2>
+    <span className="text-gray-600 mb-2"><b>Street-No: </b>{location.street_no}</span><br />
+    <span className="text-gray-600 mb-2"><b>City: </b>{location.city}</span><br />
+    <span className="text-gray-600 mb-2"><b>State: </b>{location.state}</span>
+    <p className="text-gray-600 mb-2"><b>Contact:</b> {contact_number}</p>
     <div className="mt-4">
       <h3 className="text-lg font-medium text-gray-700 mb-2">Available Blood Types:</h3>
       <div className="flex flex-wrap gap-2">
-        {availableBloodTypes.map((type) => (
-          <span key={type} className="bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
-            {type}
-          </span>
-        ))}
+        {availableBloodTypes && availableBloodTypes.length > 0 ? (
+          availableBloodTypes.map((type, index) => (
+            <span key={index} className="bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
+              {type}
+            </span>
+          ))
+        ) : (
+          <span className="text-gray-600">No blood types available</span>
+        )}
       </div>
     </div>
   </div>
@@ -99,6 +84,7 @@ const BloodBankCard = ({ name, address, contactNumber, availableBloodTypes }) =>
 
 const BloodBankListPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [bloodBanks, setBloodBanks] = useState([]);
   const navigate = useNavigate();
 
   const handleLogout = async () => {
@@ -116,48 +102,26 @@ const BloodBankListPage = () => {
     navigate('/user/profile');
   };
 
-  // Sample data for blood banks
-  const bloodBanks = [
-    {
-      id: 1,
-      name: "City Central Blood Bank",
-      address: "123 Main St, Downtown, City",
-      contactNumber: "+1 (555) 123-4567",
-      availableBloodTypes: ["A+", "B+", "O+", "AB+"]
-    },
-    {
-      id: 2,
-      name: "Westside Medical Center Blood Bank",
-      address: "456 West Ave, Westside, City",
-      contactNumber: "+1 (555) 987-6543",
-      availableBloodTypes: ["A-", "B-", "O-", "AB-"]
-    },
-    {
-      id: 3,
-      name: "Eastside Community Blood Bank",
-      address: "789 East Blvd, Eastside, City",
-      contactNumber: "+1 (555) 246-8135",
-      availableBloodTypes: ["A+", "A-", "B+", "B-", "O+", "O-"]
-    },
-    {
-      id: 4,
-      name: "Northside Hospital Blood Center",
-      address: "321 North Rd, Northside, City",
-      contactNumber: "+1 (555) 369-2580",
-      availableBloodTypes: ["O+", "O-", "AB+", "AB-"]
-    },
-    {
-      id: 5,
-      name: "Southside Red Cross Blood Bank",
-      address: "654 South St, Southside, City",
-      contactNumber: "+1 (555) 159-7531",
-      availableBloodTypes: ["A+", "B+", "AB+", "O+"]
-    }
-  ];
+  const handleBloodBankClick = (id) => {
+    navigate(`/user/bankdetails/${id}`);
+  };
+
+  useEffect(() => {
+    const fetchbloodBanks = async () => {
+      try {
+        const res = await axios.get('http://localhost:8080/admin');
+        setBloodBanks(res.data);
+      } catch (error) {
+        console.log("Error", error);
+      }
+    };
+    fetchbloodBanks();
+  }, []);
 
   const filteredBloodBanks = bloodBanks.filter(bank =>
-    bank.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    bank.address.toLowerCase().includes(searchTerm.toLowerCase())
+    (bank.institution_name && bank.institution_name.toLowerCase().includes(searchTerm.toLowerCase())) ||
+    (bank.location && bank.location.city && bank.location.city.toLowerCase().includes(searchTerm.toLowerCase())) ||
+    (bank.location && bank.location.state && bank.location.state.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
   return (
@@ -167,9 +131,16 @@ const BloodBankListPage = () => {
         <div className="px-4 py-6 sm:px-0">
           <h1 className="text-3xl font-bold text-gray-900 mb-6">Blood Banks in the City</h1>
           {filteredBloodBanks && filteredBloodBanks.length > 0 ? (
-            filteredBloodBanks.map(bank => (
-              <BloodBankCard key={bank.id} {...bank} />
-            ))
+            filteredBloodBanks.map((bank, index) => (
+              <BloodBankCard
+                key={index}
+                id={bank._id} 
+                institution_name={bank.institution_name}
+                location={bank.location}
+                contact_number={bank.contact_number}
+                availableBloodTypes={bank.availableBloodTypes}
+                onClick={handleBloodBankClick}
+              />))
           ) : (
             <p className="text-gray-600 text-center">No blood banks found matching your search.</p>
           )}
