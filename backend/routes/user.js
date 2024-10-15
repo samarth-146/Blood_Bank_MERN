@@ -80,7 +80,7 @@ router.post('/logout',(req,res)=>{
 
 router.get('/:user_id',async(req,res)=>{
     let user_id=req.params.user_id;
-    console.log(user_id);
+    // console.log(user_id);
     let data=await User.findById(user_id);
     res.status(200).json(data);
 });

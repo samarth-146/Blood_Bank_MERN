@@ -14,6 +14,7 @@ import AdminSignUpPage from './Components/AdminSignUp';
 import AdminSignIn from './Components/AdminSignIn';
 import AdminProfilePage from './Components/AdminProfile';
 import BloodBankDetailPage from './Components/BloodBankDetails';
+import BloodDonationForm from './Components/DonationForm';
 
 
 function App() {
@@ -56,6 +57,11 @@ function App() {
           <Route exact path='/user/bankdetails/:id' element={
             <PrivateRoute requiredRole="user">
               <BloodBankDetailPage/>
+            </PrivateRoute>
+          }/>
+          <Route exact path='/user/donation_form/:user_id/:admin_id' element={
+            <PrivateRoute requiredRole="user">
+              <BloodDonationForm/>
             </PrivateRoute>
           }/>
         </Routes>

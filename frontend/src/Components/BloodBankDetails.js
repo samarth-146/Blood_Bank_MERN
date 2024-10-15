@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import { jwtDecode } from 'jwt-decode';
+
 
 const Button = ({ children, className, variant = 'primary', onClick }) => {
   const baseStyle = "px-6 py-2 rounded-md font-semibold text-sm transition-colors duration-200";
@@ -103,7 +105,23 @@ const BloodBankDetailPage = () => {
   };
 
   const handleDonateBlood = () => {
-    toast.info("Blood donation feature coming soon!");
+    const token = localStorage.getItem('token');
+    if(token){
+      try{
+          const decodedToken = jwtDecode(token);
+          const userId = decodedToken.userId;
+        if(bloodBank && userId)
+          {
+            navigate(`/user/donation_form/${userId}/${bloodBank._id}`);
+          }
+          else{
+            toast.error("Unable to process");
+          }
+      }catch(e){
+        console.error("Error",e);
+        toast.error("Currently Not Available");
+      }
+    }    
   };
 
   const handleRequestBlood = () => {

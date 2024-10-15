@@ -16,35 +16,37 @@ router.get('/',async(req,res)=>{
 
 router.post('/', authMiddleware, async (req, res) => {
     try {
-        const { admin_name, donation_date, quantity } = req.body;
+        console.log(req.body);
+        const { adminId, userId, donationDate } = req.body;
 
-        const admin = await Admin.findOne({ institution_name: admin_name });
+        // Find the admin by ID
+        const admin = await Admin.findById(adminId);
         if (!admin) {
             return res.status(404).json({ error: 'Admin not found' });
         }
-
-        const data = {
-            user_id: req.user,
-            admin_id: admin._id,
-            donation_date,
-            quantity,
+        const bloodDonationData = {
+            user_id: userId,         
+            admin_id: admin._id,     
+            donation_date: donationDate,
         };
 
-        const bloodDonation = new BloodDonation(data);
+        const bloodDonation = new BloodDonation(bloodDonationData);
         await bloodDonation.save();
 
         await User.findByIdAndUpdate(
-            req.user, 
+            userId,
             { $push: { blood_donation: bloodDonation._id } }, 
             { new: true }
         );
 
         res.status(201).json(bloodDonation);
+
     } catch (error) {
         console.log(error);
         res.status(500).json({ error: error.message });
     }
 });
+
 
 router.get('/user/:user_id', async (req, res) => {
     try {
