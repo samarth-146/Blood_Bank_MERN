@@ -47,6 +47,15 @@ router.post('/', authMiddleware, async (req, res) => {
     }
 });
 
+router.get('/:id',async(req,res)=>{
+    try{
+        const id=req.params.id;
+        const data=await BloodDonation.findById(id);
+        res.status(200).json(data);
+    }catch(error){
+        console.error("Error ",error);
+    }
+})
 
 router.get('/user/:user_id', async (req, res) => {
     try {

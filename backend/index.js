@@ -19,7 +19,9 @@ const port=process.env.port;
 
 
 async function main(){
-    await mongoose.connect(mongourl);
+    await mongoose.connect(mongourl,{
+        serverSelectionTimeoutMS: 30000 
+    });
 }
 main().catch(err => console.log(err));
 

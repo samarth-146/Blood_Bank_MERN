@@ -28,7 +28,7 @@ export default function AboutPage() {
             <nav className="hidden md:flex space-x-10">
               <a href="/" className="text-base font-medium text-gray-500 hover:text-gray-900">Home</a>
               <a href="/about" className="text-base font-medium text-gray-900">About</a>
-              <a href="/support" className="text-base font-medium text-gray-500 hover:text-gray-900">Support</a>
+              {/* <a href="/support" className="text-base font-medium text-gray-500 hover:text-gray-900">Support</a> */}
             </nav>
             <div className="flex items-center">
               <Button href="/signup" className="ml-8">Sign up</Button>

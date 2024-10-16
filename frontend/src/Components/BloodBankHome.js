@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
-const Navbar = ({ onLogout,OnProfileClick }) => (
+const Navbar = ({ onLogout,OnProfileClick,onAddStock }) => (
   <nav className="bg-red-600 shadow-lg mb-8">
     <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
       <div className="relative flex items-center justify-between h-16">
@@ -17,6 +17,12 @@ const Navbar = ({ onLogout,OnProfileClick }) => (
             <svg className="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
             </svg>
+          </button>
+          <button
+          className='ml-4 bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded'
+          onClick={onAddStock}
+          >
+            Add Stock
           </button>
           <button
             className="ml-4 bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded"
@@ -112,6 +118,9 @@ export default function BloodBankHomePage() {
     }
   };
 
+  const handleStock=()=>{
+    navigate('/admin/inventory_form');
+  }
   const handleAdminProfile=()=>{
     navigate('/admin/profile');
   }
@@ -141,7 +150,7 @@ export default function BloodBankHomePage() {
 
   return (
     <div className="min-h-screen bg-gray-100">
-      <Navbar onLogout={handleLogout} OnProfileClick={handleAdminProfile} />
+      <Navbar onLogout={handleLogout} OnProfileClick={handleAdminProfile} onAddStock={handleStock} />
       <div className="p-8">
         <h1 className="text-3xl font-bold text-red-600 mb-8">Blood Bank Management System</h1>
         

@@ -9,11 +9,15 @@ const bloodInventorySchema=Schema({
     blood_inventory:[{
         blood_type:{
             type:String,
-            eunm:['A+','B+','A-','B+','O+','O-','AB+','AB-'],
+            eunm:['A+','B+','A-','B+','O+','O-','AB+','AB-','B-'],
             required:true
         },
         quantity:{
             type:Number,
+            required:true
+        },
+        expiration_date:{
+            type:Date,
             required:true
         }
     }],

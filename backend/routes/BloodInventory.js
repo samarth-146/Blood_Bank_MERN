@@ -16,15 +16,45 @@ router.get('/admin/:admin_id',async(req,res)=>{
 
 router.post('/',authMiddleware,async(req,res)=>{
     try{
-        const blood_inventory=new BloodInventory(req.body);
-        blood_inventory.admin_id=req.user;
-        await blood_inventory.save();
-        res.status(201).json(blood_inventory);
+        const {adminId,stockEntries}=req.body;
+        console.log(stockEntries);
+        let bloodInventory = await BloodInventory.findOne({ admin_id: adminId });
+        if (bloodInventory) {
+            stockEntries.forEach(entry => {
+                const existingEntry = bloodInventory.blood_inventory.find(b => 
+                    b.blood_type === entry.bloodType && b.expiration_date === entry.expirationDate
+                );
+                if (existingEntry) {
+                    existingEntry.quantity += parseInt(entry.quantity);
+                } else {
+                    bloodInventory.blood_inventory.push({ 
+                        blood_type: entry.bloodType, 
+                        quantity: parseInt(entry.quantity), 
+                        expiration_date: entry.expirationDate 
+                    });
+                }
+            });
+            bloodInventory.last_updated = Date.now();
+        }
+        else{
+            bloodInventory = new BloodInventory({
+                admin_id:adminId,
+                blood_inventory: stockEntries.map(entry => ({
+                    blood_type: entry.bloodType,
+                    quantity: entry.quantity,
+                    expiration_date:entry.expirationDate,
+                })),
+                last_updated: Date.now()
+            });
+        }
+        await bloodInventory.save();
+        res.status(201).json({ message: 'Blood stock updated successfully' });
+    
     }
     catch(error)
     {
         console.log(error);
-        res.status(500).message({message:error.message});
+        res.status(500).json({message:error.message});
     }
 });
 

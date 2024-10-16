@@ -15,6 +15,7 @@ import AdminSignIn from './Components/AdminSignIn';
 import AdminProfilePage from './Components/AdminProfile';
 import BloodBankDetailPage from './Components/BloodBankDetails';
 import BloodDonationForm from './Components/DonationForm';
+import BloodStockForm from './Components/BloodInventoryForm';
 
 
 function App() {
@@ -64,6 +65,11 @@ function App() {
               <BloodDonationForm/>
             </PrivateRoute>
           }/>
+          <Route exact path='/admin/inventory_form' element={
+            <PrivateRoute requiredRole="admin">
+              <BloodStockForm/>
+            </PrivateRoute>
+          } />
         </Routes>
       </Router>
     </div>

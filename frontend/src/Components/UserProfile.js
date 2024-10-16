@@ -54,6 +54,7 @@ export default function UserProfilePage() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [bloodDonations,setBloodDonations]=useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -67,6 +68,15 @@ export default function UserProfilePage() {
             headers: { Authorization: `Bearer ${token}` }
           });
           setUser(response.data);
+          if (response.data.blood_donation.length > 0) {
+            const bloodDonationPromises = response.data.blood_donation.map(bloodDonationId =>
+              axios.get(`http://localhost:8080/blood_donation/${bloodDonationId}`, {
+                headers: { Authorization: `Bearer ${token}` }
+              })
+            );
+            const bloodDonationResponses = await Promise.all(bloodDonationPromises);
+            setBloodDonations(bloodDonationResponses.map(res => res.data));
+          }
         } catch (error) {
           console.error('Error fetching user data:', error);
           setError('Failed to load user profile. Please try again later.');
@@ -162,6 +172,22 @@ export default function UserProfilePage() {
                   icon={<svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9" /></svg>}
                 />
               </div>
+              <h2 className="mt-6 text-2xl font-semibold text-gray-700">Blood Donation Records</h2>
+              {bloodDonations.length > 0 ? (
+                <div className="mt-4">
+                  {bloodDonations.map((donation) => (
+                    <div key={donation._id} className="bg-gray-200 p-4 mb-4 rounded-lg shadow">
+                      <p className="font-bold">Donation Date: {new Date(donation.donation_date).toLocaleDateString()}</p>
+                      <p className="text-gray-600">Admin ID: {donation.admin_id}</p>
+                      <p className="text-gray-600">Status {donation.status}</p>
+                      <p className="text-gray-600">Created At: {new Date(donation.created_at).toLocaleDateString()}</p>
+                      <p className="text-gray-600">Updated At: {new Date(donation.updated_at).toLocaleDateString()}</p>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="mt-4 text-gray-600">No blood donation records found.</p>
+              )}
             </div>
           </div>
         </div>
