@@ -22,24 +22,19 @@ const authMiddleware = (req, res, next) => {
 };
 
 const adminAuthMiddleware = async (req, res, next) => {
-    const token = req.header('Authorization')?.split(' ')[1];
+    const token = req.header('Authorization').replace('Bearer ', '');
     if (!token) {
-        return res.status(401).json({ message: "No token, authorization denied" });
+        return res.status(401).json({ message: 'Access denied, no token provided' });
     }
 
     try {
-        const decoded = jwt.verify(token, JWT_SECRET);
-
-        const admin = await Admin.findById(decoded.id);
-        if (!admin) {
-            return res.status(403).json({ message: "Access denied. Admins only." });
-        }
-
-        req.admin = admin;
+        const decoded = jwt.verify(token, process.env.JWT_SECRET); // Verify the token
+        console.log(decoded);
+        decoded.role='admin';
+        req.admin = decoded;
         next();
-    } catch (error) {
-        console.error("JWT verification error:", error);
-        res.status(401).json({ message: "Token is not valid" });
+    } catch (err) {
+        res.status(400).json({ message: 'Invalid token' });
     }
 };
 

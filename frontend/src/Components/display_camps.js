@@ -40,7 +40,7 @@ const Navbar = ({ onSearch, onLogout, onProfileClick, onAllCampsClick }) => (
           <div className="relative mr-4">
             <input
               type="text"
-              placeholder="Search blood banks..."
+              placeholder="Search camps..."
               className="bg-red-700 text-white placeholder-red-200 rounded-md py-2 px-3 focus:outline-none focus:ring-2 focus:ring-white"
               onChange={(e) => onSearch(e.target.value)}
             />
@@ -61,22 +61,20 @@ const Navbar = ({ onSearch, onLogout, onProfileClick, onAllCampsClick }) => (
   </nav>
 );
 
-const BloodBankCard = ({ id, institution_name, location, contact_number, onClick }) => (
+const CampCard = ({ eventName, date, location, description }) => (
   <div
-    className="bg-white shadow-md rounded-lg p-6 mb-4 hover:shadow-lg transition-shadow duration-300 cursor-pointer"
-    onClick={() => onClick(id)}
+    className="bg-white shadow-md rounded-lg p-6 mb-4 hover:shadow-lg transition-shadow duration-300"
   >
-    <h2 className="text-xl font-semibold text-gray-800 mb-4">{institution_name}</h2>
-    <span className="text-gray-600 mb-4"><b>Street-No: </b>{location.street_no}</span><br />
-    <span className="text-gray-600 mb-4"><b>City: </b>{location.city}</span><br />
-    <span className="text-gray-600 mb-4"><b>State: </b>{location.state}</span>
-    <p className="text-gray-600 mb-4"><b>Contact:</b> {contact_number}</p>
+    <h2 className="text-xl font-semibold text-gray-800 mb-2">{eventName}</h2>
+    <p className="text-gray-600 mb-2"><b>Date:</b> {new Date(date).toLocaleDateString()}</p>
+    <p className="text-gray-600 mb-2"><b>Location:</b> {location}</p>
+    <p className="text-gray-600 mb-2"><b>Description:</b> {description}</p>
   </div>
 );
 
-const BloodBankListPage = () => {
+const AllCampsPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [bloodBanks, setBloodBanks] = useState([]);
+  const [camps, setCamps] = useState([]);
   const navigate = useNavigate();
 
   const handleLogout = async () => {
@@ -87,6 +85,7 @@ const BloodBankListPage = () => {
       navigate('/user/signin');
     } catch (error) {
       console.error("Logout error", error);
+      toast.error("Logout failed. Please try again.");
     }
   };
 
@@ -94,30 +93,27 @@ const BloodBankListPage = () => {
     navigate('/user/profile');
   };
 
-  const handleBloodBankClick = (id) => {
-    navigate(`/user/bankdetails/${id}`);
-  };
-
   const handleAllCampsClick = () => {
     navigate('/user/all-camps');
   };
 
+
   useEffect(() => {
-    const fetchbloodBanks = async () => {
+    const fetchCamps = async () => {
       try {
-        const res = await axios.get('http://localhost:8080/admin');
-        setBloodBanks(res.data);
+        const res = await axios.get('http://localhost:8080/bloodcamp');
+        setCamps(res.data);
       } catch (error) {
-        console.log("Error", error);
+        console.error("Error fetching camps:", error);
+        toast.error("Failed to fetch camps. Please try again later.");
       }
     };
-    fetchbloodBanks();
+    fetchCamps();
   }, []);
 
-  const filteredBloodBanks = bloodBanks.filter(bank =>
-    (bank.institution_name && bank.institution_name.toLowerCase().includes(searchTerm.toLowerCase())) ||
-    (bank.location && bank.location.city && bank.location.city.toLowerCase().includes(searchTerm.toLowerCase())) ||
-    (bank.location && bank.location.state && bank.location.state.toLowerCase().includes(searchTerm.toLowerCase()))
+  const filteredCamps = camps.filter(camp =>
+    camp.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    camp.location.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -130,20 +126,19 @@ const BloodBankListPage = () => {
       />
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         <div className="px-4 py-6 sm:px-0">
-          <h1 className="text-3xl font-bold text-gray-900 mb-6">Blood Banks in the City</h1>
-          {filteredBloodBanks && filteredBloodBanks.length > 0 ? (
-            filteredBloodBanks.map((bank, index) => (
-              <BloodBankCard
+          <h1 className="text-3xl font-bold text-gray-900 mb-6">All Blood Donation Camps</h1>
+          {filteredCamps && filteredCamps.length > 0 ? (
+            filteredCamps.map((camp, index) => (
+              <CampCard
                 key={index}
-                id={bank._id} 
-                institution_name={bank.institution_name}
-                location={bank.location}
-                contact_number={bank.contact_number}
-                // availableBloodTypes={bank.availableBloodTypes}
-                onClick={handleBloodBankClick}
-              />))
+                eventName={camp.name}
+                date={camp.date}
+                location={camp.location}
+                description={camp.description}
+              />
+            ))
           ) : (
-            <p className="text-gray-600 text-center">No blood banks found matching your search.</p>
+            <p className="text-gray-600 text-center">No camps found matching your search.</p>
           )}
         </div>
       </main>
@@ -151,4 +146,4 @@ const BloodBankListPage = () => {
   );
 }
 
-export default BloodBankListPage;
+export default AllCampsPage;

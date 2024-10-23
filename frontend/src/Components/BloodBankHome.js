@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
+
+
 const Navbar = ({ onLogout,OnProfileClick,onAddStock }) => (
   <nav className="bg-red-600 shadow-lg mb-8">
     <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
@@ -94,10 +96,11 @@ const InventoryTable = ({ inventory }) => (
   </div>
 );
 
-const OrganizeBloodCampButton = () => (
+
+const OrganizeBloodCampButton = ({ onOrganizeCamp }) => (
   <button
     className="mt-8 bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded"
-    onClick={() => alert('Organizing a blood camp!')}
+    onClick={onOrganizeCamp}
   >
     Organize Blood Camp
   </button>
@@ -106,6 +109,8 @@ const OrganizeBloodCampButton = () => (
 export default function BloodBankHomePage() {
   const navigate=useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
+  const [donors, setDonors] = useState([]);
+
 
   const handleLogout = async () => {
     try {
@@ -118,31 +123,39 @@ export default function BloodBankHomePage() {
     }
   };
 
+  useEffect(() => {
+    const fetchDonors = async () => {
+        try {
+            const response = await axios.get('http://localhost:8080/admin/donors', {
+                headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+            });
+            setDonors(response.data);
+        } catch (error) {
+            console.error("Error fetching donors:", error);
+        }
+    };
+
+    fetchDonors();
+}, []);
+
+
+
   const handleStock=()=>{
     navigate('/admin/inventory_form');
   }
+  const handleOrganizeCamp = () => {
+    navigate('/admin/blood_camp/form');
+  };
   const handleAdminProfile=()=>{
     navigate('/admin/profile');
   }
   // Sample data for donors
-  const allDonors = [
-    { name: "John Doe", contactNumber: "123-456-7890", bloodType: "A+" },
-    { name: "Jane Smith", contactNumber: "098-765-4321", bloodType: "B-" },
-    { name: "Alice Johnson", contactNumber: "111-222-3333", bloodType: "O+" },
-    { name: "Bob Williams", contactNumber: "444-555-6666", bloodType: "AB-" },
-    { name: "Charlie Brown", contactNumber: "777-888-9999", bloodType: "A-" },
-  ];
+ 
 
   // Sample data for inventory
-  const inventoryData = [
-    { bloodType: "A+", quantity: 50, expirationDate: "2023-12-31" },
-    { bloodType: "B-", quantity: 30, expirationDate: "2023-12-25" },
-    { bloodType: "O+", quantity: 100, expirationDate: "2024-01-15" },
-    { bloodType: "AB-", quantity: 20, expirationDate: "2023-12-20" },
-    { bloodType: "A-", quantity: 40, expirationDate: "2024-01-05" },
-  ];
 
-  const filteredDonors = allDonors.filter(donor =>
+
+  const filteredDonors = donors.filter(donor =>
     donor.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     donor.contactNumber.includes(searchTerm) ||
     donor.bloodType.toLowerCase().includes(searchTerm.toLowerCase())
@@ -153,16 +166,17 @@ export default function BloodBankHomePage() {
       <Navbar onLogout={handleLogout} OnProfileClick={handleAdminProfile} onAddStock={handleStock} />
       <div className="p-8">
         <h1 className="text-3xl font-bold text-red-600 mb-8">Blood Bank Management System</h1>
-        
+  
         <SearchBar onSearch={setSearchTerm} />
-        
+  
         <h2 className="text-2xl font-bold mb-4">Donor List</h2>
-        <DonorTable donors={filteredDonors} />
-        
-        <InventoryTable inventory={inventoryData} />
-        
-        <OrganizeBloodCampButton />
+        <DonorTable donors={filteredDonors.length > 0 ? filteredDonors : donors} />
+  
+        {/* <InventoryTable inventory={inventoryData} /> */}
+  
+        <OrganizeBloodCampButton onOrganizeCamp={handleOrganizeCamp} />
       </div>
     </div>
   );
+  
 }

@@ -8,11 +8,10 @@ router.get('/',async(req,res)=>{
     res.status(200).json(data);
 });
 
-router.post('/', adminAuthMiddleware, async (req, res) => {
+router.post('/',async (req, res) => {
     try {
         const blood_camp = new BloodCamp({
             ...req.body,
-            admin_id: req.admin._id 
         });
         await blood_camp.save();
         res.status(201).json(blood_camp);

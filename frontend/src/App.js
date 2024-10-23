@@ -16,6 +16,7 @@ import AdminProfilePage from './Components/AdminProfile';
 import BloodBankDetailPage from './Components/BloodBankDetails';
 import BloodDonationForm from './Components/DonationForm';
 import BloodStockForm from './Components/BloodInventoryForm';
+import AllCampsPage from './Components/display_camps';
 
 
 function App() {
@@ -70,7 +71,18 @@ function App() {
               <BloodStockForm/>
             </PrivateRoute>
           } />
+          <Route exact path='/admin/blood_camp/form' element={
+            <PrivateRoute requiredRole="admin">
+              <BloodCampForm/>
+            </PrivateRoute>
+          } />
+        <Route exact path='user/all-camps' element={
+          <PrivateRoute requiredRole="user">
+            <AllCampsPage/>
+          </PrivateRoute>
+        }/>
         </Routes>
+    
       </Router>
     </div>
   );
