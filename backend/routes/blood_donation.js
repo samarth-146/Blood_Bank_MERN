@@ -84,6 +84,16 @@ router.patch('/user/:user_id',async(req,res)=>{
     }
 });
 
+router.delete('/:id',async(req,res)=>{
+    try{
+        const id=req.params.id;
+        const deleteDonation=await BloodDonation.deleteOne({_id:id});
+        res.json(deleteDonation);
+    }catch(e){
+
+    }
+})
+
 router.delete('/user/:user_id',async(req,res)=>{
     try{
         const deleteDonation=await BloodDonation.deleteMany({user_id:req.params.user_id});

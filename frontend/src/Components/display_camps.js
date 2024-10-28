@@ -132,7 +132,7 @@ const AllCampsPage = () => {
               <CampCard
                 key={index}
                 eventName={camp.name}
-                date={camp.date}
+                date={camp.camp_date}
                 location={camp.location}
                 description={camp.description}
               />

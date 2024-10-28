@@ -124,9 +124,6 @@ const BloodBankDetailPage = () => {
     }    
   };
 
-  const handleRequestBlood = () => {
-    toast.info("Blood request feature coming soon!");
-  };
 
   if (loading) {
     return <div className="text-center mt-8">Loading...</div>;
@@ -189,7 +186,6 @@ const BloodBankDetailPage = () => {
           </div>
           <div className="mt-8 flex justify-center space-x-4">
             <Button onClick={handleDonateBlood}>Donate Blood</Button>
-            <Button onClick={handleRequestBlood} variant="outline">Request Blood</Button>
           </div>
         </div>
       </main>

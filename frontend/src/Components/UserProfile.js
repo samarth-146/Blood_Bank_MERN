@@ -9,7 +9,8 @@ const Button = ({ children, className, variant = 'primary', onClick }) => {
   const variants = {
     primary: "bg-red-600 text-white hover:bg-red-700",
     outline: "bg-white text-red-600 border border-red-600 hover:bg-red-50",
-    plain: "bg-white text-black"
+    plain: "bg-white text-black",
+    danger: "bg-red-500 text-white hover:bg-red-600"
   };
 
   const buttonClass = `${baseStyle} ${variants[variant]} ${className || ''}`;
@@ -54,7 +55,7 @@ export default function UserProfilePage() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [bloodDonations,setBloodDonations]=useState([]);
+  const [bloodDonations, setBloodDonations] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -68,14 +69,15 @@ export default function UserProfilePage() {
             headers: { Authorization: `Bearer ${token}` }
           });
           setUser(response.data);
-          if (response.data.blood_donation.length > 0) {
+          if (response.data.blood_donation && response.data.blood_donation.length > 0) {
             const bloodDonationPromises = response.data.blood_donation.map(bloodDonationId =>
               axios.get(`http://localhost:8080/blood_donation/${bloodDonationId}`, {
                 headers: { Authorization: `Bearer ${token}` }
               })
             );
             const bloodDonationResponses = await Promise.all(bloodDonationPromises);
-            setBloodDonations(bloodDonationResponses.map(res => res.data));
+            const donations = bloodDonationResponses.map(res => res.data).filter(donation => donation !== null);
+            setBloodDonations(donations);
           }
         } catch (error) {
           console.error('Error fetching user data:', error);
@@ -101,6 +103,20 @@ export default function UserProfilePage() {
     } catch (error) {
       console.error("Logout error", error);
       toast.error("Logout failed. Please try again.");
+    }
+  };
+
+  const handleDeleteDonation = async (donationId) => {
+    try {
+      const token = localStorage.getItem('token');
+      await axios.delete(`http://localhost:8080/blood_donation/${donationId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setBloodDonations(bloodDonations.filter(donation => donation._id !== donationId));
+      toast.success("Blood donation record deleted successfully");
+    } catch (error) {
+      console.error("Delete error", error);
+      toast.error("Failed to delete blood donation record. Please try again.");
     }
   };
 
@@ -174,19 +190,44 @@ export default function UserProfilePage() {
               </div>
               <h2 className="mt-6 text-2xl font-semibold text-gray-700">Blood Donation Records</h2>
               {bloodDonations.length > 0 ? (
-                <div className="mt-4">
+                <div className="mt-4 space-y-4">
                   {bloodDonations.map((donation) => (
-                    <div key={donation._id} className="bg-gray-200 p-4 mb-4 rounded-lg shadow">
-                      <p className="font-bold">Donation Date: {new Date(donation.donation_date).toLocaleDateString()}</p>
-                      <p className="text-gray-600">Admin ID: {donation.admin_id}</p>
-                      <p className="text-gray-600">Status {donation.status}</p>
-                      <p className="text-gray-600">Created At: {new Date(donation.created_at).toLocaleDateString()}</p>
-                      <p className="text-gray-600">Updated At: {new Date(donation.updated_at).toLocaleDateString()}</p>
-                    </div>
+                    donation && (
+                      <div key={donation._id} className="bg-white p-6 rounded-lg shadow-md border border-gray-200">
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <h3 className="text-lg font-semibold text-gray-900">
+                              Donation on {donation.donation_date ? new Date(donation.donation_date).toLocaleDateString() : 'Unknown Date'}
+                            </h3>
+                          </div>
+                          <Button
+                            variant="danger"
+                            onClick={() => handleDeleteDonation(donation._id)}
+                            className="text-xs px-3 py-1"
+                          >
+                            Delete
+                          </Button>
+                        </div>
+                        <div className="mt-4 grid grid-cols-2 gap-4 text-sm">
+                          <div>
+                            <p className="text-gray-500">Donation Date</p>
+                            <p className="font-medium text-gray-900">
+                              {donation.donation_date ? new Date(donation.donation_date).toLocaleString() : 'Not available'}
+                            </p>
+                          </div>
+                          <div>
+                            <p className="text-gray-500">Created At</p>
+                            <p className="font-medium text-gray-900">
+                              {donation.created_at ? new Date(donation.created_at).toLocaleString() : 'Not available'}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    )
                   ))}
                 </div>
               ) : (
-                <p className="mt-4 text-gray-600">No blood donation records found.</p>
+                <p className="mt-4  text-gray-600">No blood donation records found.</p>
               )}
             </div>
           </div>

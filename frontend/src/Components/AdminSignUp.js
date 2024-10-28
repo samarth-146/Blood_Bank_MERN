@@ -4,6 +4,20 @@ import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate } from 'react-router-dom';
 
+const Navbar = () => (
+  <nav className="bg-red-600 shadow-lg">
+    <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
+      <div className="relative flex items-center justify-between h-16">
+        <div className="flex-1 flex items-center justify-center sm:items-stretch sm:justify-start">
+          <div className="flex-shrink-0 flex items-center">
+            <a href='/' className="text-white text-lg font-bold">BloodBridge</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+);
+
 const InputField = ({ label, type, id, value, onChange, required }) => (
   <div>
     <label htmlFor={id} className="block text-sm font-medium text-gray-700">
@@ -70,9 +84,9 @@ export default function AdminSignUpPage() {
       if (res.status === 201) {
         setSuccess("Admin Registered Successfully");
         setError('');
-        const role="admin";
+        const role = "admin";
         localStorage.setItem('token', res.data.token);
-        localStorage.setItem('role',role);
+        localStorage.setItem('role', role);
         setFormData({
           institution_name: '',
           street_no: '',
@@ -92,106 +106,109 @@ export default function AdminSignUpPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-red-50 to-gray-100 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-          Sign up as an Admin
-        </h2>
-        <p className="mt-2 text-center text-sm text-gray-600">
-          Register your institution for the blood bank management system
-        </p>
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-red-50 to-gray-100 flex flex-col">
+      <Navbar />
+      <div className="flex-grow flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+        <div className="sm:mx-auto sm:w-full sm:max-w-md">
+          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+            Sign up as an Admin
+          </h2>
+          <p className="mt-2 text-center text-sm text-gray-600">
+            Register your institution for the blood bank management system
+          </p>
+        </div>
 
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10 border border-red-100">
-          <form className="space-y-6" onSubmit={handleSubmit}>
-            <InputField
-              label="Institution Name"
-              type="text"
-              id="institution_name"
-              value={formData.institution_name}
-              onChange={handleChange}
-              required
-            />
-            <InputField
-              label="Email"
-              type="email"
-              id="email"
-              value={formData.email}
-              onChange={handleChange}
-              required
-            />
-            <InputField
-              label="Password"
-              type="password"
-              id="password"
-              value={formData.password}
-              onChange={handleChange}
-              required
-            />
-            <InputField
-              label="Contact Number"
-              type="tel"
-              id="contact_number"
-              value={formData.contact_number}
-              onChange={handleChange}
-              required
-            />
-            <InputField
-              label="Street No"
-              type="text"
-              id="street_no"
-              value={formData.street_no}
-              onChange={handleChange}
-              required
-            />
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+        <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+          <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10 border border-red-100">
+            <form className="space-y-6" onSubmit={handleSubmit}>
               <InputField
-                label="City"
+                label="Institution Name"
                 type="text"
-                id="city"
-                value={formData.city}
+                id="institution_name"
+                value={formData.institution_name}
                 onChange={handleChange}
                 required
               />
               <InputField
-                label="State"
-                type="text"
-                id="state"
-                value={formData.state}
+                label="Email"
+                type="email"
+                id="email"
+                value={formData.email}
                 onChange={handleChange}
                 required
               />
-            </div>
-
-            <div>
-              <Button type="submit">Sign up</Button>
-            </div>
-          </form>
-
-          <div className="mt-6">
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-300" />
+              <InputField
+                label="Password"
+                type="password"
+                id="password"
+                value={formData.password}
+                onChange={handleChange}
+                required
+              />
+              <InputField
+                label="Contact Number"
+                type="tel"
+                id="contact_number"
+                value={formData.contact_number}
+                onChange={handleChange}
+                required
+              />
+              <InputField
+                label="Street No"
+                type="text"
+                id="street_no"
+                value={formData.street_no}
+                onChange={handleChange}
+                required
+              />
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                <InputField
+                  label="City"
+                  type="text"
+                  id="city"
+                  value={formData.city}
+                  onChange={handleChange}
+                  required
+                />
+                <InputField
+                  label="State"
+                  type="text"
+                  id="state"
+                  value={formData.state}
+                  onChange={handleChange}
+                  required
+                />
               </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-gray-500">
-                  Already have an account?
-                </span>
+
+              <div>
+                <Button type="submit">Sign up</Button>
               </div>
-            </div>
+            </form>
 
             <div className="mt-6">
-              <a
-                href="/admin/signin"
-                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-red-600 bg-white hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
-              >
-                Sign in
-              </a>
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-gray-300" />
+                </div>
+                <div className="relative flex justify-center text-sm">
+                  <span className="px-2 bg-white text-gray-500">
+                    Already have an account?
+                  </span>
+                </div>
+              </div>
+
+              <div className="mt-6">
+                <a
+                  href="/admin/signin"
+                  className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-red-600 bg-white hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                >
+                  Sign in
+                </a>
+              </div>
             </div>
+            {error && <p className="mt-4 text-red-600">{error}</p>}
+            {success && <p className="mt-4 text-green-600">{success}</p>}
           </div>
-          {error && <p className="mt-4 text-red-600">{error}</p>}
-          {success && <p className="mt-4 text-green-600">{success}</p>}
         </div>
       </div>
     </div>

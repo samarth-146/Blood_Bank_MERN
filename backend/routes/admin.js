@@ -105,12 +105,19 @@ router.get('/donors',adminAuthMiddleware, async (req, res) => {
 module.exports = router;
 
 
-router.get('/:id',async(req,res)=>{
-    const id=req.params.id;
-    let data=await Admin.findById(id);
-    // console.log(data);
-    res.status(200).json(data);
-})
+router.get('/:admin_id', async (req, res) => {
+    const { admin_id } = req.params;
+    try {
+      const admin = await Admin.findById(admin_id); // Fetch admin from the database
+      if (!admin) {
+        return res.status(404).json({ message: 'Admin not found' });
+      }
+      res.json(admin); // Return the admin data
+    } catch (error) {
+      res.status(500).json({ message: 'Error fetching admin details' });
+    }
+  });
+  
 
 router.patch('/:id', async (req, res) => {
     const id = req.params.id;
